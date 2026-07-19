@@ -1,22 +1,20 @@
 # TOTP Toolkit
 
-Offline TOTP/HOTP examples for both Python and browser JavaScript:
+Simple [RFC 6238 TOTP](https://www.rfc-editor.org/rfc/rfc6238) examples for
+both Python and browser JavaScript.
 
-- [RFC 4226](https://www.rfc-editor.org/rfc/rfc4226) — HOTP
-- [RFC 6238](https://www.rfc-editor.org/rfc/rfc6238) — TOTP
-
-The Python implementation uses only the standard library. The JavaScript
-version is a static local-first web page powered by the vendored open-source
-[OTPAuth](https://github.com/hectorm/otpauth) library. Neither version needs a
-backend service.
+The Python script uses the open-source [PyOTP](https://github.com/pyauth/pyotp)
+package. The JavaScript version is a static local-first web page powered by the
+vendored open-source [OTPAuth](https://github.com/hectorm/otpauth) library.
+Neither version needs a backend service to generate codes.
 
 ## Repository layout
 
 ```text
 totp-toolkit/
 ├── python/
-│   ├── totp.py              # Pure-Python HOTP/TOTP implementation and CLI
-│   └── test_totp.py         # RFC 6238 vectors and behavior tests
+│   └── totp.py              # Small PyOTP-based command-line generator
+├── requirements.txt         # Pinned Python dependency
 └── javascript/
     ├── index.html           # Offline browser interface
     ├── test.js              # RFC 6238 JavaScript smoke test
@@ -27,42 +25,21 @@ totp-toolkit/
 
 ## Python version
 
-Requires Python 3.9 or newer. No packages need to be installed.
+Install PyOTP and run the script:
 
 ```console
-cd python
-python totp.py
+python -m pip install -r requirements.txt
+python python/totp.py
 ```
 
-The default hidden prompt avoids exposing the Base32 secret in command
-history. To continuously display the code and remaining lifetime:
-
-```console
-python totp.py --watch
-```
-
-Programmatic usage:
+The secret is entered through a hidden prompt so it does not appear in command
+history. The underlying Python operation is simply:
 
 ```python
-from totp import generate_totp, remaining_seconds, verify_totp
+import pyotp
 
-secret = "JBSWY3DPEHPK3PXP"  # Public demonstration secret only.
-token = generate_totp(secret)
-
-print(token)
-print(remaining_seconds(), "seconds remaining")
-assert verify_totp(token, secret)
+print(pyotp.TOTP("JBSWY3DPEHPK3PXP").now())
 ```
-
-Run the tests:
-
-```console
-cd python
-python -m unittest -v
-```
-
-The suite checks all SHA-1, SHA-256, and SHA-512 examples from Appendix B of
-RFC 6238, plus input validation and clock-window behavior.
 
 ## JavaScript version
 
